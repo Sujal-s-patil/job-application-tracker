@@ -7,6 +7,10 @@ const port = process.env.PORT || 8000
 //importing  routes
 import { userRouter } from "./routes/user.js";
 
+// middleware
+app.use(express.json())
+
+
 app.use('/user',userRouter)
 
 

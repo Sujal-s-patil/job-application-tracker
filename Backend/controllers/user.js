@@ -3,7 +3,7 @@ import { pool } from "../db/sql.js";
 import { createToken } from "../utils/jwt.js";
 
 async function register(req, res) {
-    if (!req.body.firstName && !req.body.lastName && !req.body.email && !req.body.password) {
+    if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password) {
         return res.status(400).json({ success: false, message: "body not present" })
     }
 
@@ -22,16 +22,16 @@ async function register(req, res) {
 }
 
 async function login(req, res) {
-    if (!req.body) {
+    if ( !req.body.email || !req.body.password) {
         return res.status(400).json({ success: false, message: "body not present" })
     }
 
     try {
         const query = `select * from users where email=?`;
         // query to check if the email exist
-        const [rows] = await pool.query(query, req.body.email)
+        const [rows] = await pool.query(query, [req.body.email])
 
-        // if no user then return the responce 
+        // if no user then return the responcef 
         if (rows.length === 0) return res.status(401).json({ success: false, message: "email or password is incorrect" })
 
         // matching the password with the hashvalue of the password
@@ -51,7 +51,8 @@ async function login(req, res) {
         })
         return res.status(200).json({ success: true, message: "login successful" })
     } catch (error) {
-
+        console.log(error)
+        return res.status(500).json({ success: false, message: "internal server error" })
     }
 }
 

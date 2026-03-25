@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
 const secretKey = process.env.SECRET_KEY;
 
-function createToken(user) {
+function createToken({ id, firstName, lastName, email }) {
     return jwt.sign({
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email
+        id,
+        firstName,
+        lastName,
+        email
     }, secretKey, {
         expiresIn: "24h"
     })

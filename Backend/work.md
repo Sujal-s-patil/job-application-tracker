@@ -4,10 +4,10 @@ mysql
 ```sql
 create table users(
     id int AUTO_INCREMENT,
-    firstName varchar(200),
-    lastName varchar(200),
+    firstName varchar(200) NOT NULL,
+    lastName varchar(200)  NOT NULL,
     email varchar(200) not null unique,
-    password varchar(200),
+    password varchar(200)  NOT NULL,
     primary key(id)
 );
 ```

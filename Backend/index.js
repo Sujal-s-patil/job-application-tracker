@@ -9,8 +9,11 @@ const port = process.env.PORT || 8000
 import { userRoute } from "./routes/user.js";
 import { applicationRoute } from "./routes/application.js"
 
-// importing authentication verifyer
+// importing local middlewares
+// importing authentication verifier
 import { verifyUser } from "./middleware/verify.js"
+import {validateUser} from "./middleware/validation.js"
+
 
 // middleware
 app.use(express.json())
@@ -18,7 +21,7 @@ app.use(cookieParser())
 
 
 // routes
-app.use('/user', userRoute)
+app.use('/user',validateUser,userRoute)
 app.use("/application", verifyUser, applicationRoute);
 
 app.get('/', (req, res) => {

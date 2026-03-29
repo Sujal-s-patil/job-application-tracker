@@ -1,42 +1,33 @@
 import { z } from "zod";
 
-const applicationSchema = z.object({
-    userId: z.number(),
-    title: z.string().nonempty(),
-    roleApplied: z.string().nonempty(),
-    jobDescription: z.string().nonempty(),
+const createApplicationSchema = z.object({
+    title: z.string().min(1, "title is not provided"),
+    roleApplied: z.string().min(1, "applied for role is not provided"),
+    jobDescription: z.string().min(1, "job description is not provided"),
     applicationStatus: z.enum(["applied", "interview", "accepted", "rejected"]).default('applied'),
-    noteForApplied: z.string().nonempty().optional(),
-    noteForInterview: z.string().nonempty().optional(),
-    noteForAccepted: z.string().nonempty().optional(),
-    noteForRejected: z.string().nonempty().optional(),
+    noteForApplied: z.string().min(1, "applied note is not provided").optional(),
+    noteForInterview: z.string().min(1, "interview note is not provided").optional(),
+    noteForAccepted: z.string().min(1, "accepted note is not provided").optional(),
+    noteForRejected: z.string().min(1, "rejected note is not provided").optional(),
 }).strict()
 
-/* 
-CREATE TABLE applications(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    userId INT NOT NULL,
-    title VARCHAR(200),
-    roleApplied VARCHAR(200),
-    jobDescription TEXT,
-    dateApplied DATETIME DEFAULT CURRENT_TIMESTAMP,
-    applicationStatus ENUM("applied","interview","accepted","rejected") DEFAULT "applied",
-    noteForApplied TEXT,
-    noteForInterview TEXT,
-    noteForAccepted TEXT,
-    noteForRejected TEXT,
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-);
-*/
 
 
-
+const updateApplicationSchema = z.object({
+    title: z.string().min(1, "title is not provided").optional(),
+    roleApplied: z.string().min(1, "applied for role is not provided").optional(),
+    jobDescription: z.string().min(1, "job description is not provided").optional(),
+    applicationStatus: z.enum(["applied", "interview", "accepted", "rejected"]).optional(),
+    noteForApplied: z.string().min(1, "applied note is not provided").optional(),
+    noteForInterview: z.string().min(1, "interview note is not provided").optional(),
+    noteForAccepted: z.string().min(1, "accepted note is not provided").optional(),
+    noteForRejected: z.string().min(1, "rejected note is not provided").optional(),
+}).strict()
 
 
 export {
-    applicationSchema
+    createApplicationSchema,
+    updateApplicationSchema
 }
 
 

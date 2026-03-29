@@ -15,8 +15,8 @@ async function getAppliactions(req, res) {
 
 async function createApplication(req, res) {
     try {
-        const keys = Object.keys(req.body);
-        const values = [req.user.id, ...Object.values(req.body)]
+        const keys = Object.keys(req.validatedData);
+        const values = [req.user.id, ...Object.values(req.validatedData)]
         const query = `INSERT INTO applications (userId,${keys}) values (?,${new Array(keys.length).fill("?").join(",")})`;
 
         await pool.query(query, values);
@@ -61,8 +61,8 @@ async function updateApplication(req, res) {
         if (!req.params.id) {
             return res.status(401).json({ success: false, message: "id is not provided" })
         }
-        const keys = Object.keys(req.body);
-        const values = Object.values(req.body);
+        const keys = Object.keys(req.validatedData);
+        const values = Object.values(req.validatedData);
         values.push(req.params.id);
         values.push(req.user.id);
         const query = `UPDATE applications set ${keys.map((v) => v + '=?')} where id=? and userId=?`;

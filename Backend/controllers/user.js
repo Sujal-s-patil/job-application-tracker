@@ -3,18 +3,16 @@ import { pool } from "../db/sql.js";
 import { createToken } from "../utils/jwt.js";
 
 async function register(req, res) {
-    if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password) {
-        return res.status(400).json({ success: false, message: "body not present" })
-    }
-
     try {
+        const { firstName, lastName, email, password } = req.validatedData;
         // hashing the password
-        const password = await bcrypt.hash(req.body.password, 12);
-        const values = [req.body.firstName, req.body.lastName, req.body.email, password]
+        const passwordHash = await bcrypt.hash(password, 12);
+        const values = [firstName, lastName, email, passwordHash]
         const createUser = `INSERT INTO users (firstName,lastName,email,password) VALUES (?,?,?,?)`
-        const result = await pool.query(createUser, values);
+        await pool.query(createUser, values);
         return res.status(201).json({ success: true, message: "user created successfully" })
     } catch (error) {
+        console.log(error)
         // if get error that means user already exist
         return res.status(409).json({ success: false, message: "user already exist" })
     }
@@ -22,20 +20,17 @@ async function register(req, res) {
 }
 
 async function login(req, res) {
-    if ( !req.body.email || !req.body.password) {
-        return res.status(400).json({ success: false, message: "body not present" })
-    }
-
     try {
+        const { email, password } = req.validatedData;
         const query = `select * from users where email=?`;
         // query to check if the email exist
-        const [rows] = await pool.query(query, [req.body.email])
+        const [rows] = await pool.query(query, [email])
 
         // if no user then return the responcef 
         if (rows.length === 0) return res.status(401).json({ success: false, message: "email or password is incorrect" })
 
         // matching the password with the hashvalue of the password
-        const isMatch = await bcrypt.compare(req.body.password, rows[0].password)
+        const isMatch = await bcrypt.compare(password, rows[0].password)
 
         // if password doen not match return responce 
         if (!isMatch) {

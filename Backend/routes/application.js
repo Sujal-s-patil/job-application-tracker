@@ -1,6 +1,7 @@
 import express from "express";
-
 const applicationRoute = express.Router();
+import validate from "../middleware/validation.js"
+import { createApplicationSchema, updateApplicationSchema } from "../schemas/applicationSchema.js";
 
 import {
     getAppliactions,
@@ -12,14 +13,12 @@ import {
 
 applicationRoute.get("/", getAppliactions);
 
-applicationRoute.post('/', createApplication);
+applicationRoute.post('/',validate(createApplicationSchema), createApplication);
 
 applicationRoute
     .route("/:id")
     .get(getApplication)
-    .put(updateApplication)
+    .put(validate(updateApplicationSchema),updateApplication)
     .delete(deleteApplication)
 
-export {
-    applicationRoute
-}
+export default applicationRoute;

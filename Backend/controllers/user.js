@@ -22,7 +22,7 @@ async function register(req, res) {
 async function login(req, res) {
     try {
         const { email, password } = req.validatedData;
-        const query = `select * from users where email=?`;
+        const query = `SELECT id, firstName, lastName, email, password FROM users WHERE email = ?`;
         // query to check if the email exist
         const [rows] = await pool.query(query, [email])
 
@@ -32,7 +32,7 @@ async function login(req, res) {
         // matching the password with the hashvalue of the password
         const isMatch = await bcrypt.compare(password, rows[0].password)
 
-        // if password doen not match return responce 
+        // if password does not match return responce 
         if (!isMatch) {
             return res.status(401).json({ success: false, message: "email or password is incorrect" })
         }

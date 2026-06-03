@@ -11,14 +11,15 @@ import {
     updateApplication
 } from "../controllers/application.js"
 
-applicationRoute.get("/", getAppliactions);
-
-applicationRoute.post('/',validate(createApplicationSchema), createApplication);
-
+applicationRoute
+    .route("/")
+    .get(getAppliactions)
+    .post(validate(createApplicationSchema), createApplication)
+    
 applicationRoute
     .route("/:id")
     .get(getApplication)
-    .put(validate(updateApplicationSchema),updateApplication)
+    .put(validate(updateApplicationSchema), updateApplication)
     .delete(deleteApplication)
 
 export default applicationRoute;

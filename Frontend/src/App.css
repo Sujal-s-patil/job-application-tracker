@@ -1,1 +1,15 @@
+.form {
+  display: grid;
+  place-items: center;
+  height: 100vh;
 
+}
+
+form {
+  border: 1px solid black;
+  padding: 2%;
+}
+
+.button {
+  border: 1px solid black;
+}

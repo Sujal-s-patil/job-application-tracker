@@ -1,21 +1,28 @@
-import { useState } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import Add from "./pages/Add";
 
-import { Routes, Route } from "react-router-dom"
+import { ProtectedRoute, PublicRoute } from "./components/ProtectedRoute";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <Routes>
-        <Route index  element={<Login />} />
-        <Route path='register' element={<Register />} />
+    <Routes>
+      <Route element={<PublicRoute />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
 
-      </Routes>
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path='/add' element={<Add />} />
+      </Route>
 
-    </>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 

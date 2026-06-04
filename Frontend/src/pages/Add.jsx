@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 function Add() {
     const [formData, setFormData] = useState({ title: "", roleApplied: "", jobDescription: "", applicationStatus: "applied", noteForApplied: "" })
     const handleChange = (e) => {
@@ -52,7 +53,8 @@ function Add() {
                 </select>
                 <p>note (applied)</p>
                 <textarea name="noteForApplied" onChange={handleChange} placeholder="enter your note"></textarea><br />
-                <button type="submit">Submit</button>
+                <button type="submit">Submit</button> <p>   </p>
+            <Link to="/dashboard">go to dashboard</Link>
             </form>
         </div>
     )
@@ -62,6 +64,6 @@ function Add() {
 export default Add
 
 function get() {
-    fetch("http://localhost:8000/application",{credentials:"include"})
+    fetch("http://localhost:8000/application", { credentials: "include" })
         .then(reponce => reponce.json()).then(data => console.log(data))
 }

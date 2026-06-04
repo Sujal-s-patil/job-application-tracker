@@ -35,7 +35,7 @@ function Dashboard() {
 
   return (
     <main>
-      <h1>Dashboard</h1>
+      <h1>Job Application Tracker</h1>
       <div className="navbar">
         <Link to="/add" className="link">add application</Link>
         {userInfo && <Profile info={userInfo} />}

@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Application from "./Application"
+import Application from "./Application";
+import Profile from "./Profile";
+
 function Dashboard() {
   const [data, setData] = useState([])
+  const [userInfo, setUserInfo] = useState({})
   const api = import.meta.env.VITE_API_URL;
   useEffect(() => {
     async function fetchApplication() {
@@ -21,15 +24,21 @@ function Dashboard() {
         console.error(error)
       }
     }
+    function getUserInfo() {
+      const object = localStorage.getItem('userInfo');
+      const data = JSON.parse(object)
+      setUserInfo(data)
+    }
+    getUserInfo()
     fetchApplication()
   }, [])
 
   return (
     <main>
+      <h1>Dashboard</h1>
       <div className="navbar">
-        <h1>Dashboard</h1>
-        <p>profile</p>
-        <Link to="/add" className="button">add application</Link>
+        <Link to="/add" className="link">add application</Link>
+        {userInfo && <Profile info={userInfo} />}
       </div>
       <div className="applications">
         <ul>

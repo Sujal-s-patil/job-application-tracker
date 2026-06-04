@@ -24,6 +24,7 @@ function Login() {
             const data = await response.json()
 
             if (response.ok && data.success) {
+                localStorage.setItem("userInfo", JSON.stringify(data.userInfo))
                 navigate("/dashboard")
             }
         } catch (error) {

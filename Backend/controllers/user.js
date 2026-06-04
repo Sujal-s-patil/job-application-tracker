@@ -44,13 +44,22 @@ async function login(req, res) {
             maxAge: 24 * 60 * 60 * 1000,
             sameSite: "strict"
         })
-        return res.status(200).json({ success: true, message: "login successful" })
+        const payload = { userId: rows[0].id, firstName: rows[0].firstName, lastName: rows[0].lastName, email: rows[0].email }
+        return res.status(200).json({ success: true, message: "login successful", userInfo: payload })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ success: false, message: "internal server error" })
     }
 }
 
+async function logout(req, res) {
+    res.clearCookie("token", {
+        httpOnly: true,
+        sameSite: "strict"
+    })
+    res.status(200).json({ success: true, message: "lougout successfully" })
+}
+
 export {
-    register, login
+    register, login, logout
 }

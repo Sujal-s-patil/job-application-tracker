@@ -36,8 +36,8 @@ function Dashboard() {
   return (
     <main>
       <h1>Job Application Tracker</h1>
-      <div className="navbar">
-        <Link to="/add" className="link">add application</Link>
+      <div style={styles.navbar}>
+        <Link to="/add" style={styles.link}>add application</Link>
         {userInfo && <Profile info={userInfo} />}
       </div>
       <div className="applications">
@@ -49,6 +49,24 @@ function Dashboard() {
       </div>
     </main>
   )
+}
+
+const styles = {
+  navbar: {
+    display: "flex",
+    borderBottom: "1px solid black",
+    justifyContent: "space-between",
+    paddingBottom: "3px",
+    paddingLeft: "30px",
+    paddingRight: "30px",
+  },
+  link: {
+    border: "1px solid black",
+    height: "fit-content",
+    alignSelf: "center",
+    textDecoration: "none",
+    borderRadius: "4px",
+  }
 }
 
 export default Dashboard

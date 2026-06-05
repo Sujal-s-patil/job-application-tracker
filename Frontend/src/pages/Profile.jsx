@@ -16,10 +16,10 @@ function UserProfile({ info }) {
 
     return (
         <div>
-            <p onClick={() => setPanel(true)}>
-                {info.firstName} {info.lastName}
-            </p>
 
+            <div onClick={() => setPanel(true)} style={styles.box}>
+                {info.firstName} {info.lastName}
+            </div>
             {panel && (
                 <div style={styles.overlay} onClick={() => setPanel(false)}>
                     <div style={styles.panel} onClick={(e) => e.stopPropagation()}>
@@ -57,9 +57,14 @@ const styles = {
         minWidth: "300px",
         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)"
     },
-    justify:{
-        display:"flex",
-        justifyContent:"space-between"
+    justify: {
+        display: "flex",
+        justifyContent: "space-between"
+    },
+    box: {
+        cursor: "pointer",
+        border: "1px solid black",
+        borderRadius: "3px"
     }
 };
 

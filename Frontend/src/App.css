@@ -2,7 +2,6 @@
   display: grid;
   place-items: center;
   height: 100vh;
-
 }
 
 form {
@@ -10,13 +9,5 @@ form {
   padding: 2%;
 }
 
-.link {
-  border: 1px solid black;
-}
 
-.navbar{
-  display: flex;
-  border-bottom: 1px solid black;
-  justify-content: space-around;
-  padding-bottom: 3px;
-}
+

@@ -57,7 +57,7 @@ function Application({ p }) {
                             </p> : ""
                         )}
                         <div style={{ display: "flex", justifyContent: "space-evenly" }}>
-                            <Link to={`/update`} state={{ application: applicationData }}>update</Link>
+                            <Link to={`/update`} state={{ p }}>update</Link>
                             <button onClick={() => setDeletePanel(true)}>delete</button>
                             {deletePanel &&
                                 <div

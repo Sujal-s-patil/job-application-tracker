@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-
+import { Link } from "react-router-dom"
 function Application({ p }) {
     const [panel, setPanel] = useState(false);
     const [deletePanel, setDeletePanel] = useState(false);
@@ -57,7 +57,7 @@ function Application({ p }) {
                             </p> : ""
                         )}
                         <div style={{ display: "flex", justifyContent: "space-evenly" }}>
-                            <button>update</button>
+                            <Link to={`/update`} state={{ application: applicationData }}>update</Link>
                             <button onClick={() => setDeletePanel(true)}>delete</button>
                             {deletePanel &&
                                 <div

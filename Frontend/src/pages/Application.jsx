@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom"
 function Application({ p }) {
+    const api = import.meta.env.VITE_API_URL;
     const [panel, setPanel] = useState(false);
     const [deletePanel, setDeletePanel] = useState(false);
     const [applicationData, setApplicationData] = useState({});
@@ -10,7 +11,6 @@ function Application({ p }) {
             deletePanelRef.current?.focus()
         }
     }, [deletePanel])
-    const api = import.meta.env.VITE_API_URL;
     const showApplicationDetails = async () => {
         try {
             const responce = await fetch(`${api}/application/${p.id}`, {

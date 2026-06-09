@@ -1,5 +1,6 @@
 export async function verifyAuthSession() {
-  const response = await fetch("http://localhost:8000/user/verify", {
+  const api = import.meta.env.VITE_API_URL;
+  const response = await fetch(`${api}/user/verify`, {
     method: "GET",
     credentials: "include",
   })

@@ -62,8 +62,3 @@ function Add() {
 
 
 export default Add
-
-function get() {
-    fetch("http://localhost:8000/application", { credentials: "include" })
-        .then(reponce => reponce.json()).then(data => console.log(data))
-}

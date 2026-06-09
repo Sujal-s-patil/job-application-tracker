@@ -35,9 +35,9 @@ function Dashboard() {
 
   return (
     <main>
-      <h1>Job Application Tracker</h1>
-      <div style={styles.navbar}>
-        <Link to="/add" style={styles.link}>add application</Link>
+      <h1 className="mt-2 pl-5 font-bold leading-tight text-4xl">Job Application Tracker</h1>
+      <div className="flex border-b justify-between pt-2 pb-2 pl-10 pr-10" >
+        <Link to="/add">add application</Link>
         {userInfo && <Profile info={userInfo} />}
       </div>
       <div className="applications">
@@ -51,22 +51,5 @@ function Dashboard() {
   )
 }
 
-const styles = {
-  navbar: {
-    display: "flex",
-    borderBottom: "1px solid black",
-    justifyContent: "space-between",
-    paddingBottom: "3px",
-    paddingLeft: "30px",
-    paddingRight: "30px",
-  },
-  link: {
-    border: "1px solid black",
-    height: "fit-content",
-    alignSelf: "center",
-    textDecoration: "none",
-    borderRadius: "4px",
-  }
-}
 
 export default Dashboard

@@ -1,2 +1,27 @@
-
 @import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+    input[type="text"],
+    textarea {
+        @apply w-full rounded-lg border border-black bg-white px-3 py-2 text-sm placeholder-gray-400 outline-none transition;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+        @apply border-blue-500 ring-2 ring-blue-500/20;
+    }
+
+    button{
+        @apply border rounded-sm px-3
+    }
+
+    a{
+        @apply border self-center rounded-[4px] p-1
+    }
+}
+

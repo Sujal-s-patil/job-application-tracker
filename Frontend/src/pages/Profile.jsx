@@ -17,15 +17,15 @@ function UserProfile({ info }) {
     return (
         <div>
 
-            <div onClick={() => setPanel(true)} style={styles.box}>
+            <div onClick={() => setPanel(true)} className="border cursor-pointer rounded-[3px] p-1">
                 {info.firstName} {info.lastName}
             </div>
             {panel && (
-                <div style={styles.overlay} onClick={() => setPanel(false)}>
-                    <div style={styles.panel} onClick={(e) => e.stopPropagation()}>
+                <div className="fixed top-0 left-0 w-full h-full bg-black/40 flex justify-center items-center z-[1000]" onClick={() => setPanel(false)}>
+                    <div className="bg-white  min-w-80 p-6 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.2)]" onClick={(e) => e.stopPropagation()}>
                         <p>full name : {info.firstName} {info.lastName}</p>
                         <p>email : {info.email}</p>
-                        <div style={styles.justify}>
+                        <div className="flex justify-between mt-3">
                             <button onClick={logout}>logout</button>
                             <button onClick={() => setPanel(false)}>close</button>
                         </div>
@@ -36,36 +36,5 @@ function UserProfile({ info }) {
         </div>
     );
 }
-
-const styles = {
-    overlay: {
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        backgroundColor: "rgba(0, 0, 0, 0.4)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 1000
-    },
-    panel: {
-        backgroundColor: "white",
-        padding: "20px",
-        borderRadius: "10px",
-        minWidth: "300px",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)"
-    },
-    justify: {
-        display: "flex",
-        justifyContent: "space-between"
-    },
-    box: {
-        cursor: "pointer",
-        border: "1px solid black",
-        borderRadius: "3px"
-    }
-};
 
 export default UserProfile;

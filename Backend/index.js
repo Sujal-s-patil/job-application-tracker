@@ -1,9 +1,8 @@
+import config from "./config/env.js"
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors"
 const app = express();
-const port = process.env.PORT || 8000
-
 
 //importing  routes
 import userRoute from "./routes/user.js";
@@ -13,6 +12,7 @@ import applicationRoute from "./routes/application.js"
 import { verifyUser } from "./middleware/verify.js"
 
 // middleware
+import { authLimiter, globalLimiter } from "./middleware/rateLimiter.js"
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
@@ -21,13 +21,13 @@ app.use(cors({
 }))
 
 // routes
-app.use('/user',userRoute)
-app.use("/application", verifyUser, applicationRoute);
+app.use('/user', authLimiter, userRoute)
+app.use("/application", globalLimiter, verifyUser, applicationRoute);
 
 app.get('/', (req, res) => {
     return res.end("server is running")
 })
 
-app.listen(port, () => {
-    console.log('server started on port:', port)
+app.listen(config.PORT, () => {
+    console.log('server started on port:', config.PORT)
 })

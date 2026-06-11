@@ -60,6 +60,26 @@ async function logout(req, res) {
     res.status(200).json({ success: true, message: "lougout successfully" })
 }
 
+async function deleteUser(req, res) {
+    try {
+        const password = req.validatedData.password;
+        const userId = req.user.id
+        const [rows] = await pool.query("select password from users where id=?", [userId])
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "user does not exist" })
+        }
+        const verify = await bcrypt.compare(password, rows[0].password);
+        if (verify) {
+            await pool.query('delete from users where id=?', [userId])
+            return res.status(200).json({ success: true, message: "user deleted successfully" })
+        }
+        return res.status(401).json({ success: false, message: "wrong password" })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ success: false, message: "internal server error" })
+    }
+}
+
 export {
-    register, login, logout
+    register, login, logout, deleteUser
 }

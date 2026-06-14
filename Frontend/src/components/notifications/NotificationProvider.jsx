@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { NotificationContext } from "./notificationContext"
 
 function createNotification(message, tone = "info") {
@@ -13,7 +13,7 @@ export function NotificationProvider({ children }) {
   const [notifications, setNotifications] = useState([])
   const timersRef = useRef(new Map())
 
-  const removeNotification = (id) => {
+  const removeNotification = useCallback((id) => {
     setNotifications((current) => current.filter((notification) => notification.id !== id))
 
     const timer = timersRef.current.get(id)
@@ -21,16 +21,37 @@ export function NotificationProvider({ children }) {
       clearTimeout(timer)
       timersRef.current.delete(id)
     }
-  }
+  }, [])
 
-  const notify = (message, tone = "info") => {
+  const notify = useCallback((message, tone = "info") => {
     const notification = createNotification(message, tone)
     setNotifications((current) => [...current, notification])
 
     const timer = window.setTimeout(() => removeNotification(notification.id), 3800)
     timersRef.current.set(notification.id, timer)
-  }
+  }, [removeNotification])
 
+  // Dismiss latest notification on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key !== "Escape") return
+      setNotifications((current) => {
+        if (current.length === 0) return current
+        const latest = current[current.length - 1]
+        const timer = timersRef.current.get(latest.id)
+        if (timer) {
+          clearTimeout(timer)
+          timersRef.current.delete(latest.id)
+        }
+        return current.slice(0, -1)
+      })
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
+
+  // Cleanup all timers on unmount
   useEffect(() => {
     return () => {
       const timers = timersRef.current
@@ -39,12 +60,15 @@ export function NotificationProvider({ children }) {
     }
   }, [])
 
-  const value = { notify, removeNotification }
+  const value = useMemo(() => ({ notify, removeNotification }), [notify, removeNotification])
 
   return (
     <NotificationContext.Provider value={value}>
       {children}
-      <div className="pointer-events-none fixed right-4 top-4 z-[3000] flex w-[min(92vw,24rem)] flex-col gap-3" aria-live="polite">
+      <div
+        className="pointer-events-none fixed right-4 top-4 z-[3000] flex w-[min(92vw,24rem)] flex-col gap-3"
+        aria-live="polite"
+      >
         {notifications.map((notification) => {
           const toneClasses =
             notification.tone === "success"

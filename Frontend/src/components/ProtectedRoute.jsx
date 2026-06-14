@@ -1,37 +1,13 @@
-import { useEffect, useState } from "react"
 import { Navigate, Outlet, useLocation } from "react-router-dom"
-import { verifyAuthSession } from "../utils/auth"
+import { useAuthSession } from "../hooks/useAuthSession"
+import { FullPageLoader } from "./ui/Feedback"
 
 export function ProtectedRoute() {
   const location = useLocation()
-  const [status, setStatus] = useState("loading")
-
-  useEffect(() => {
-    let isMounted = true
-
-    async function checkAuth() {
-      try {
-        const authenticated = await verifyAuthSession()
-
-        if (isMounted) {
-          setStatus(authenticated ? "authenticated" : "unauthenticated")
-        }
-      } catch {
-        if (isMounted) {
-          setStatus("unauthenticated")
-        }
-      }
-    }
-
-    checkAuth()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
+  const status = useAuthSession()
 
   if (status === "loading") {
-    return null
+    return <FullPageLoader title="Checking your session" message="Please wait while we verify your login state." />
   }
 
   if (status !== "authenticated") {
@@ -42,5 +18,15 @@ export function ProtectedRoute() {
 }
 
 export function PublicRoute() {
+  const status = useAuthSession()
+
+  if (status === "loading") {
+    return <FullPageLoader title="Loading" message="Preparing the authentication flow." />
+  }
+
+  if (status === "authenticated") {
+    return <Navigate to="/dashboard" replace />
+  }
+
   return <Outlet />
 }

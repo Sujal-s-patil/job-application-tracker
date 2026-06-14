@@ -8,10 +8,10 @@ const userRoute = express.Router();
 userRoute.post("/register", validate(registerSchema), register)
 userRoute.post("/login", validate(loginSchema), login)
 userRoute.get("/logout", logout)
+userRoute.delete("/delete", validate(loginSchema), verifyUser, deleteUser)
 userRoute.get("/verify", verifyUser, (req, res) => {
 	return res.status(200).json({ success: true, message: "user verified" })
 })
-userRoute.delete("/delete", validate(loginSchema), verifyUser, deleteUser)
 
 
 export default userRoute;

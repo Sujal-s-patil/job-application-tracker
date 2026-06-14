@@ -1,62 +1,81 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import ApplicationForm from "../components/ApplicationForm"
+import { PageShell } from "../components/layout/PageShell"
+import { Button } from "../components/ui/Button"
+import { request, sanitizePayload } from "../lib/api"
+import { initialApplicationValues, normalizeApplicationValues, validateApplication } from "../lib/applicationForm"
+import { useNotifications } from "../components/notifications/useNotifications"
+
 function Add() {
-    const [formData, setFormData] = useState({ title: "", roleApplied: "", jobDescription: "", applicationStatus: "applied", noteForApplied: "" })
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value })
+    const navigate = useNavigate()
+    const { notify } = useNotifications()
+    const [formData, setFormData] = useState(initialApplicationValues)
+    const [errors, setErrors] = useState({})
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
+    const handleChange = (event) => {
+        const { name, value } = event.target
+        setFormData((current) => ({ ...current, [name]: value }))
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            const api = import.meta.env.VITE_API_URL;
-            const responce = await fetch(`${api}/application`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify(formData)
-            })
-            const data = await responce.json();
-            if (responce.ok && data.success) {
-                alert("submitted")
-            }
-            console.log(data)
+    const handleSubmit = async (event) => {
+        event.preventDefault()
 
+        const nextErrors = validateApplication(formData)
+        setErrors(nextErrors)
+
+        if (Object.keys(nextErrors).length > 0) {
+            return
+        }
+
+        setIsSubmitting(true)
+
+        try {
+            const payload = sanitizePayload(normalizeApplicationValues(formData))
+            const response = await request("/application", {
+                method: "POST",
+                body: payload,
+            })
+
+            if (response?.success) {
+                notify("Application created successfully.", "success")
+                navigate("/dashboard", {
+                    replace: true,
+                    state: { flashMessage: "Application created successfully.", flashTone: "success" },
+                })
+            }
         } catch (error) {
-            console.error(error)
+            notify(error.message || "Unable to create the application.", "error")
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
     return (
-        <div className="form">
-            <form onSubmit={handleSubmit}>
-                <h2>Add application details</h2>
-                <p>title</p>
-                <input type="text" name="title" onChange={handleChange} />
-                <p>role applied for</p>
-                <input type="text" name="roleApplied" onChange={handleChange} />
-                <p>job description</p>
-                <input type="text" name="jobDescription" onChange={handleChange} />
-                <br /><br />  <span>application status   </span>
-                <select
-                    name="applicationStatus"
-                    value={formData.applicationStatus}
-                    onChange={handleChange}
-                >
-                    <option value="applied">applied</option>
-                    <option value="interview">interview</option>
-                    <option value="accepted">accepted</option>
-                    <option value="rejected">rejected</option>
-                </select>
-                <p>note (applied)</p>
-                <textarea name="noteForApplied" onChange={handleChange} placeholder="enter your note"></textarea><br />
-                <button type="submit">Submit</button> <p>   </p>
-            <Link to="/dashboard">go to dashboard</Link>
-            </form>
-        </div>
+        <PageShell
+            eyebrow="Applications"
+            title="Add a new application"
+            description="Capture the role, description, status, and notes so you can follow up without digging through other tools."
+            actions={<Button variant="secondary" to="/dashboard">Back to dashboard</Button>}
+        >
+            <div className="mx-auto w-full max-w-3xl">
+                <div className="surface p-6 sm:p-8">
+                    <ApplicationForm
+                        title="Application details"
+                        description="Every required field is validated before submission. Optional notes are preserved when provided."
+                        submitLabel="Save application"
+                        cancelLabel="Cancel"
+                        onCancel={() => navigate("/dashboard")}
+                        onSubmit={handleSubmit}
+                        values={formData}
+                        errors={errors}
+                        onChange={handleChange}
+                        isSubmitting={isSubmitting}
+                    />
+                </div>
+            </div>
+        </PageShell>
     )
 }
 

@@ -1,9 +1,10 @@
-export async function verifyAuthSession() {
-  const api = import.meta.env.VITE_API_URL;
-  const response = await fetch(`${api}/user/verify`, {
-    method: "GET",
-    credentials: "include",
-  })
+import { request } from "../lib/api"
 
-  return response.ok
+export async function verifyAuthSession() {
+  try {
+    await request("/user/verify")
+    return true
+  } catch {
+    return false
+  }
 }

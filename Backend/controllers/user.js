@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { pool } from "../db/sql.js";
 import { createToken } from "../utils/jwt.js";
+import config from "../config/env.js"
 
 async function register(req, res) {
     try {
@@ -42,7 +43,9 @@ async function login(req, res) {
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
-            sameSite: "strict"
+            sameSite: config.NODE_ENV === "production" ? "none" : "lax",
+            secure: config.NODE_ENV === "production",
+            path: "/"
         })
         const payload = { userId: rows[0].id, firstName: rows[0].firstName, lastName: rows[0].lastName, email: rows[0].email }
         return res.status(200).json({ success: true, message: "login successful", userInfo: payload })
@@ -55,9 +58,11 @@ async function login(req, res) {
 async function logout(req, res) {
     res.clearCookie("token", {
         httpOnly: true,
-        sameSite: "strict"
+        sameSite: config.NODE_ENV === "production" ? "none" : "lax",
+        secure: config.NODE_ENV === "production",
+        path: "/"
     })
-    res.status(200).json({ success: true, message: "lougout successfully" })
+    res.status(200).json({ success: true, message: "logout successfully" })
 }
 
 async function deleteUser(req, res) {
@@ -71,6 +76,11 @@ async function deleteUser(req, res) {
         const verify = await bcrypt.compare(password, rows[0].password);
         if (verify) {
             await pool.query('delete from users where id=?', [userId])
+            res.clearCookie("token", {
+                httpOnly: true,
+                sameSite: config.NODE_ENV === "production" ? "none" : "lax",
+                secure: config.NODE_ENV === "production"
+            })
             return res.status(200).json({ success: true, message: "user deleted successfully" })
         }
         return res.status(401).json({ success: false, message: "wrong password" })

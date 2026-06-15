@@ -6,7 +6,8 @@ const envSchema = z.object({
     DB_HOST: z.string().min(1, "database hostname is required"),
     DB_USER: z.string().min(1, "username for database is required"),
     DB_PASSWORD: z.string().min(1, "password for database is required"),
-    DB_DATABASE: z.string().min(1, "database name is required")
+    DB_DATABASE: z.string().min(1, "database name is required"),
+    NODE_ENV:z.enum(["development","production","test"]).default("development")
 })
 
 const parsed = envSchema.safeParse(process.env)

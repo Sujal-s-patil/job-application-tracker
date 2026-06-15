@@ -18,7 +18,7 @@ function UserProfile({ info }) {
 
     const logout = async () => {
         try {
-            await request("/user/logout")
+            await request("/user/logout", { method: "POST" })
         } finally {
             clearUserInfo()
             setPanel(false)
@@ -49,7 +49,7 @@ function UserProfile({ info }) {
         setIsSubmitting(true)
 
         try {
-            await request("/user/delete", {
+            await request("/user/me", {
                 method: "DELETE",
                 body: {
                     email: formData.email.trim(),

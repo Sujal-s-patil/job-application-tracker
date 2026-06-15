@@ -3,12 +3,13 @@ import { register, login, logout, deleteUser } from "../controllers/user.js"
 import { loginSchema, registerSchema } from "../schemas/userSchema.js"
 import validate from "../middleware/validation.js"
 import { verifyUser } from "../middleware/verify.js"
+import { authLimiter } from "../middleware/rateLimiter.js"
 const userRoute = express.Router();
 
-userRoute.post("/register", validate(registerSchema), register)
-userRoute.post("/login", validate(loginSchema), login)
-userRoute.get("/logout", logout)
-userRoute.delete("/delete", validate(loginSchema), verifyUser, deleteUser)
+userRoute.post("/register", authLimiter, validate(registerSchema), register)
+userRoute.post("/login", authLimiter, validate(loginSchema), login)
+userRoute.post("/logout", logout)
+userRoute.delete("/me", validate(loginSchema), verifyUser, deleteUser)
 userRoute.get("/verify", verifyUser, (req, res) => {
 	return res.status(200).json({ success: true, message: "user verified" })
 })

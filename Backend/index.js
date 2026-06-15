@@ -12,7 +12,7 @@ import applicationRoute from "./routes/application.js"
 import { verifyUser } from "./middleware/verify.js"
 
 // middleware
-import { authLimiter, globalLimiter } from "./middleware/rateLimiter.js"
+import { globalLimiter } from "./middleware/rateLimiter.js"
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
@@ -21,7 +21,7 @@ app.use(cors({
 }))
 
 // routes
-app.use('/user', authLimiter, userRoute)
+app.use('/user', userRoute)
 app.use("/application", globalLimiter, verifyUser, applicationRoute);
 
 app.get('/', (req, res) => {

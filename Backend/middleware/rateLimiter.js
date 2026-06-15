@@ -17,6 +17,7 @@ export const authLimiter = rateLimit({
     limit: 10,
     standardHeaders: "draft-8",
     legacyHeaders: false,
+    skipSuccessfulRequests: true,
     message: {
         success: false,
         message: "Too many login requests, please try again later after 15 minutes."

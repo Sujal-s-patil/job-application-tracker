@@ -1,17 +1,17 @@
 import jwt from "jsonwebtoken";
-const secretKey = process.env.SECRET_KEY;
+import config from "../config/env"
 
-function createToken({ id, firstName, lastName, email }) {
+function createToken({ id, email }) {
     return jwt.sign({
         id,
         email
-    }, secretKey, {
+    }, config.SECRET_KEY, {
         expiresIn: "24h"
     })
 }
 
 function verifyToken(token) {
-    return jwt.verify(token, secretKey)
+    return jwt.verify(token, secretKey, { algorithms: ["HS256"] })
 }
 
 

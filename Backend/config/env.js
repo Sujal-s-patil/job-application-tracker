@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-    SECRET_KEY: z.string().min(1, "secret key is required"),
-    PORT: z.string().transform(Number).default(8000),
+    SECRET_KEY: z.string().min(32, "secret key is required"),
+    PORT: z.coerce.number().int().positive().default(8000),
     DB_HOST: z.string().min(1, "database hostname is required"),
     DB_USER: z.string().min(1, "username for database is required"),
-    DB_PASSWORD: z.string().min(1, "password for databse is required"),
+    DB_PASSWORD: z.string().min(1, "password for database is required"),
     DB_DATABASE: z.string().min(1, "database name is required")
 })
 

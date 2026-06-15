@@ -24,8 +24,7 @@ export default function ApplicationCard({ application, onOpen }) {
         </div>
         <p className="text-sm leading-6 text-slate-600 line-clamp-3">{application.jobDescription}</p>
       </div>
-      <div className="mt-5 flex items-center justify-between gap-3">
-        <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400">Application</p>
+      <div className="mt-5 flex items-center justify-end gap-3">
         <Button type="button" variant="secondary" className="px-3 py-2 text-xs" onClick={() => onOpen(application.id)}>
           View details
         </Button>

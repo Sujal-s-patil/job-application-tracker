@@ -132,14 +132,6 @@ export default function ApplicationDetailsModal({ applicationId, onClose, onDele
                 {application?.title ?? "Application"}
               </h2>
             </div>
-            <button
-              ref={closeButtonRef}
-              type="button"
-              className="btn btn-ghost h-10 px-3"
-              onClick={onClose}
-            >
-              Close
-            </button>
           </div>
         </div>
 

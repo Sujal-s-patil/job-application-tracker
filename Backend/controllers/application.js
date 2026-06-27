@@ -1,4 +1,4 @@
-import { pool } from "../db/sql.js";
+import { pool } from "../db/pool.js";
 import { createError } from "../utils/createError.js"
 
 async function getAppliactions(req, res, next) {

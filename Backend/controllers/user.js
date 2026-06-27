@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { pool } from "../db/sql.js";
+import { pool } from "../db/pool.js";
 import { createToken } from "../utils/jwt.js";
 import config from "../config/env.js"
 import { createError } from "../utils/createError.js"

@@ -91,7 +91,6 @@ function UpdateForm() {
             })
 
             if (response?.success) {
-                notify("Application updated successfully.", "success")
                 navigate("/dashboard", {
                     replace: true,
                     state: { flashMessage: "Application updated successfully.", flashTone: "success" },

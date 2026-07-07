@@ -53,8 +53,9 @@ export function NotificationProvider({ children }) {
 
   // Cleanup all timers on unmount
   useEffect(() => {
+    const timers = timersRef.current
+
     return () => {
-      const timers = timersRef.current
       timers.forEach((timer) => clearTimeout(timer))
       timers.clear()
     }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useLocation } from "react-router-dom"
 import ApplicationCard from "../components/ApplicationCard"
 import ApplicationDetailsModal from "../components/ApplicationDetailsModal"
@@ -18,6 +18,7 @@ function Dashboard() {
   const [userInfo] = useState(() => readUserInfo())
   const location = useLocation()
   const { notify } = useNotifications()
+  const hasShownFlashMessageRef = useRef(false)
 
   useEffect(() => {
     if (status !== "loading") {
@@ -35,7 +36,20 @@ function Dashboard() {
           return
         }
 
-        setApplications(response?.rows ?? [])
+        const baseApplications = response?.rows ?? []
+        const enrichedApplications = await Promise.all(
+          baseApplications.map(async (application) => {
+            try {
+              const detailResponse = await request(`/application/${application.id}`)
+              const detail = detailResponse?.row?.[0] ?? detailResponse?.row ?? application
+              return { ...application, ...detail }
+            } catch {
+              return application
+            }
+          }),
+        )
+
+        setApplications(enrichedApplications)
         setStatus("ready")
       } catch (fetchError) {
         if (!active) {
@@ -55,13 +69,16 @@ function Dashboard() {
   }, [status])
 
   useEffect(() => {
-    if (selectedApplicationId || !location.state?.flashMessage) {
+    const flashMessage = location.state?.flashMessage
+
+    if (selectedApplicationId || !flashMessage || hasShownFlashMessageRef.current) {
       return
     }
 
-    notify(location.state.flashMessage, location.state.flashTone || "success")
+    hasShownFlashMessageRef.current = true
+    notify(flashMessage, location.state?.flashTone || "success")
     window.history.replaceState({}, document.title)
-  }, [location.state, notify, selectedApplicationId])
+  }, [location.state?.flashMessage, location.state?.flashTone, notify, selectedApplicationId])
 
   const handleRetry = () => {
     setStatus("loading")
@@ -71,6 +88,41 @@ function Dashboard() {
     setApplications((current) => current.filter((application) => application.id !== deletedId))
     setSelectedApplicationId(null)
   }
+
+  const statuses = ["applied", "interview", "accepted", "rejected"]
+
+  const handleApplicationStatusChange = async (applicationId, nextStatus) => {
+    const safeStatus = statuses.includes(nextStatus) ? nextStatus : "applied"
+    const previousApplications = applications
+
+    setApplications((current) =>
+      current.map((application) => (application.id === applicationId ? { ...application, applicationStatus: safeStatus } : application)),
+    )
+
+    try {
+      await request(`/application/${applicationId}/status`, {
+        method: "PATCH",
+        body: { applicationStatus: safeStatus },
+      })
+    } catch (updateError) {
+      setApplications(previousApplications)
+      setError(updateError.message || "Unable to update application status.")
+    }
+  }
+  const groupedApplications = applications.reduce(
+    (groups, application) => {
+      const statusKey = application.applicationStatus ?? "applied"
+      groups[statusKey] = groups[statusKey] || []
+      groups[statusKey].push(application)
+      return groups
+    },
+    {
+      applied: [],
+      interview: [],
+      accepted: [],
+      rejected: [],
+    },
+  )
 
   const content =
     status === "loading" ? (
@@ -84,9 +136,43 @@ function Dashboard() {
         action={<Button to="/add">Add application</Button>}
       />
     ) : (
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {applications.map((application) => (
-          <ApplicationCard key={application.id} application={application} onOpen={setSelectedApplicationId} />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {statuses.map((statusKey) => (
+          <section
+            key={statusKey}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault()
+              const draggedApplicationId = event.dataTransfer.getData("text/plain")
+              if (draggedApplicationId) {
+                handleApplicationStatusChange(Number(draggedApplicationId), statusKey)
+              }
+            }}
+            className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50/70 p-5"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-600">{statusKey}</h2>
+              <span className="text-xs text-slate-500">{groupedApplications[statusKey].length}</span>
+            </div>
+            <div className="space-y-4">
+              {groupedApplications[statusKey].length > 0 ? (
+                groupedApplications[statusKey].map((application) => (
+                  <ApplicationCard
+                    key={application.id}
+                    application={application}
+                    onOpen={setSelectedApplicationId}
+                    draggable
+                    onDragStart={(event) => {
+                      event.dataTransfer.setData("text/plain", String(application.id))
+                      event.dataTransfer.effectAllowed = "move"
+                    }}
+                  />
+                ))
+              ) : (
+                <p className="text-sm text-slate-500">No applications in this status.</p>
+              )}
+            </div>
+          </section>
         ))}
       </div>
     )

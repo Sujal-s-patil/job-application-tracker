@@ -39,7 +39,6 @@ function Add() {
             })
 
             if (response?.success) {
-                notify("Application created successfully.", "success")
                 navigate("/dashboard", {
                     replace: true,
                     state: { flashMessage: "Application created successfully.", flashTone: "success" },

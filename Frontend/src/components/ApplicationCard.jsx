@@ -7,11 +7,15 @@ const statusStyles = {
   rejected: "bg-rose-50 text-rose-700",
 }
 
-export default function ApplicationCard({ application, onOpen }) {
+export default function ApplicationCard({ application, onOpen, draggable = false, onDragStart }) {
   const status = application.applicationStatus ?? "applied"
 
   return (
-    <article className="surface flex h-full flex-col justify-between p-5 transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)]">
+    <article
+      draggable={draggable}
+      onDragStart={onDragStart}
+      className="surface flex h-full flex-col justify-between p-5 transition hover:-translate-y-0.5 hover:shadow-[0_24px_70px_-42px_rgba(15,23,42,0.35)]"
+    >
       <div className="space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">

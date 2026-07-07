@@ -1,6 +1,6 @@
 import { Button } from "./ui/Button"
 import { InputField, SelectField, TextareaField } from "./ui/Fields"
-import { initialApplicationValues, validateApplication } from "../lib/applicationForm"
+import { initialApplicationValues } from "../lib/applicationForm"
 
 const statusOptions = ["applied", "interview", "accepted", "rejected"]
 

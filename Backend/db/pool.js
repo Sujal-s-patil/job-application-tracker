@@ -10,6 +10,4 @@ const pool = mysql.createPool({
     queueLimit: 0
 }).promise()
 
-export {
-    pool
-}
+export default pool

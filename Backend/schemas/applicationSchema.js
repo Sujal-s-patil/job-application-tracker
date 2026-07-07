@@ -24,10 +24,13 @@ const updateApplicationSchema = z.object({
     noteForRejected: z.string().min(1, "rejected note is not provided").optional(),
 }).strict()
 
+const updateApplicationStatusSchema = z.object({
+    applicationStatus: z.enum(["applied", "interview", "accepted", "rejected"]).optional()
+}).strict()
 
 export {
     createApplicationSchema,
-    updateApplicationSchema
+    updateApplicationSchema, updateApplicationStatusSchema
 }
 
 

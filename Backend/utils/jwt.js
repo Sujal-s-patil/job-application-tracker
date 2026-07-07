@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import config from "../config/env"
+import config from "../config/env.js"
 
 function createToken({ id, email }) {
     return jwt.sign({
@@ -11,7 +11,7 @@ function createToken({ id, email }) {
 }
 
 function verifyToken(token) {
-    return jwt.verify(token, secretKey, { algorithms: ["HS256"] })
+    return jwt.verify(token, config.SECRET_KEY, { algorithms: ["HS256"] })
 }
 
 

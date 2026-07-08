@@ -4,7 +4,7 @@ import validate from "../middleware/validation.js"
 import { createApplicationSchema, updateApplicationSchema, updateApplicationStatusSchema } from "../schemas/applicationSchema.js";
 
 import {
-    getAppliactions,
+    getApplications,
     getApplication,
     createApplication,
     deleteApplication,
@@ -14,7 +14,7 @@ import {
 
 applicationRoute
     .route("/")
-    .get(getAppliactions)
+    .get(getApplications)
     .post(validate(createApplicationSchema), createApplication)
 
 applicationRoute

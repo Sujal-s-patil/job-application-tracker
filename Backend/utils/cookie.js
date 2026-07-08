@@ -19,5 +19,5 @@ function clearAuthCookie(res) {
 }
 
 export {
-    setCookie, clearCookie
+    setAuthCookie, clearAuthCookie
 };

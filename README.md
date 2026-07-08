@@ -1,163 +1,191 @@
 # Job Application Tracker
 
-A full-stack web application to track job applications, manage application statuses, and store employer/contact information. This repository contains a Node.js + Express backend and a React + Vite frontend.
+A full-stack job application tracker with a Node.js/Express + MySQL API and a React/Vite frontend for managing applications, status changes, and account access.
 
-**Status:** Prototype / in active development
+## Features
 
----
+- User registration, login, logout, session verification, and account deletion.
+- JWT authentication stored in an `httpOnly` cookie.
+- CRUD for job applications owned by the authenticated user.
+- Application status updates across `applied`, `interview`, `accepted`, and `rejected`.
+- Dashboard view that groups applications by status and supports drag-and-drop status changes.
+- Zod-backed request validation for both user and application payloads.
+- Rate limiting on auth routes and protected application routes.
+- React/Vite frontend with protected routes, notifications, and application detail modals.
 
-**Contents**
-- **Backend/**: Express API, authentication, and database access
-- **Frontend/**: React (Vite) single-page app
-- **planning.md**: Project planning notes
+## Tech Stack
 
----
+### Backend
 
-**Quick Start**
+- Node.js
+- Express
+- mysql2
+- bcrypt
+- cookie-parser
+- cors
+- helmet
+- express-rate-limit
+- jsonwebtoken
+- zod
+- jest
 
-Prerequisites:
-- Node.js 18+ and npm
-- A MySQL-compatible database (or update `Backend/db/sql.js` to use another driver)
+### Frontend
 
-Clone and run locally (two terminals):
+- React 19
+- react-dom
+- react-router-dom
+- Vite
+- @vitejs/plugin-react
+- @rolldown/plugin-babel
+- @tailwindcss/vite
+- tailwindcss
+- babel-plugin-react-compiler
+- eslint
+- @eslint/js
+- @babel/core
+- @types/react
+- @types/react-dom
+- globals
 
-Backend
+## Folder Structure
+
+```text
+.
+├── Backend/
+│   ├── .env.example
+│   ├── config/
+│   │   └── env.js
+│   ├── controllers/
+│   │   ├── application.js
+│   │   └── user.js
+│   ├── db/
+│   │   ├── pool.js
+│   │   └── schema.sql
+│   ├── middleware/
+│   │   ├── rateLimiter.js
+│   │   ├── validation.js
+│   │   └── verify.js
+│   ├── queries/
+│   │   ├── application.js
+│   │   └── user.js
+│   ├── routes/
+│   │   ├── application.js
+│   │   └── user.js
+│   ├── schemas/
+│   │   ├── applicationSchema.js
+│   │   └── userSchema.js
+│   ├── utils/
+│   │   ├── cookie.js
+│   │   ├── createError.js
+│   │   └── jwt.js
+│   ├── index.js
+│   ├── package.json
+│   └── readme.md
+├── Frontend/
+│   ├── .env.example
+│   ├── public/
+│   │   ├── favicon.svg
+│   │   └── icons.svg
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── lib/
+│   │   ├── pages/
+│   │   └── utils/
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+└── README.md
+```
+
+## Setup & Installation
+
+### Prerequisites
+
+- Node.js 18 or newer
+- npm
+- MySQL-compatible database
+
+### Backend
 
 ```bash
 cd Backend
 npm install
-# create a .env file (see example below)
-npm start      # starts server with node
-# for hot-reload (nodemon) use: npm run test
+cp .env.example .env
+npm start
 ```
 
-Frontend
+### Frontend
 
 ```bash
 cd Frontend
 npm install
+cp .env.example .env
 npm run dev
 ```
 
-Open the frontend at http://localhost:5173 (default Vite port). The backend runs on port `8000` by default.
+The backend starts with `npm start` in `Backend/` and reads `.env` with `node --env-file=.env index.js`. The frontend runs with Vite on the default dev port.
 
----
+### Useful scripts
 
-**Environment variables (Backend .env example)**
+- Backend: `npm start`, `npm test`
+- Frontend: `npm run dev`, `npm run build`, `npm run lint`, `npm run preview`
 
-Create `Backend/.env` with these keys (example):
+## Environment Variables
 
-```
-PORT=8000
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=secret
-DB_DATABASE=job_tracker
-DB_CONNECTION_LIMIT=20
-SECRET_KEY=replace_with_strong_secret
-```
+### Backend (`Backend/.env.example`)
 
-Notes:
-- The backend reads database connection settings from `process.env` in `Backend/db/sql.js`.
-- JWTs use `SECRET_KEY` (see `Backend/utils/jwt.js`).
-- Authentication uses an HTTP cookie named `token` (see `Backend/middleware/verify.js`).
+| Variable | Description | Required |
+| --- | --- | --- |
+| `SECRET_KEY` | JWT signing secret used by `Backend/utils/jwt.js`. | Y |
+| `PORT` | Server port. Defaults to `8000` in `Backend/config/env.js`. | N |
+| `CLIENT_URL` | Allowed frontend origin used by CORS in `Backend/index.js`. | Y |
+| `DB_HOST` | MySQL host. | Y |
+| `DB_USER` | MySQL user. | Y |
+| `DB_PASSWORD` | MySQL password. | Y |
+| `DB_DATABASE` | MySQL database name. | Y |
 
----
+Note: `Backend/db/pool.js` also reads `DB_CONNECTION_LIMIT` and defaults it to `20`, but that variable is not listed in `Backend/.env.example`, so it is marked as TODO to confirm.
 
-**API Overview**
+### Frontend (`Frontend/.env.example`)
 
-Base URL: `http://localhost:8000`
+| Variable | Description | Required |
+| --- | --- | --- |
+| `VITE_API_URL` | Base URL for the backend API used by `Frontend/src/lib/api.js`. | Y |
 
-Auth / User
-- POST `/user/register` — register a new user (body validated by Zod)
-- POST `/user/login` — login and set auth cookie
-- GET `/user/logout` — clear auth cookie
-- GET `/user/verify` — verify current user (requires cookie)
+## API Endpoints
 
-Applications (protected — requires auth cookie)
-- GET `/application/` — list applications
-- POST `/application/` — create a new application
-- GET `/application/:id` — fetch single application
-- PUT `/application/:id` — update application
-- DELETE `/application/:id` — delete application
+| Method | Path | Auth required | Description |
+| --- | --- | --- | --- |
+| GET | `/` | N | Health check that returns `server is running`. |
+| POST | `/user/register` | N | Register a new user. |
+| POST | `/user/login` | N | Authenticate a user and set the auth cookie. |
+| POST | `/user/logout` | N | Clear the auth cookie. |
+| GET | `/user/me` | Y | Verify the current authenticated session. |
+| DELETE | `/user/me` | Y | Delete the authenticated user after password verification. |
+| GET | `/application` | Y | List applications for the authenticated user. |
+| POST | `/application` | Y | Create a new application for the authenticated user. |
+| GET | `/application/:id` | Y | Fetch one application owned by the authenticated user. |
+| PUT | `/application/:id` | Y | Update one application owned by the authenticated user. |
+| DELETE | `/application/:id` | Y | Delete one application owned by the authenticated user. |
+| PATCH | `/application/:id/status` | Y | Update the status of one application owned by the authenticated user. |
 
-Validation is implemented with Zod schemas found in `Backend/schemas/`.
+## Security Measures Implemented
 
-Example: register with curl
+- Passwords are hashed with `bcrypt` before storage.
+- Auth uses JWTs signed with `SECRET_KEY` and stored in an `httpOnly` cookie.
+- Cookie flags are set with `sameSite` and `secure` behavior based on `NODE_ENV`.
+- Request payloads are validated with strict Zod schemas.
+- Auth and application routes are rate-limited with `express-rate-limit`.
+- SQL writes use parameterized MySQL queries with `?` placeholders.
+- `helmet` and CORS are enabled in the Express app bootstrap.
 
-```bash
-curl -X POST http://localhost:8000/user/register \
-	-H "Content-Type: application/json" \
-	-d '{"firstName":"Alice","lastName":"Lee","email":"alice@example.com","password":"P@ssw0rd"}'
-```
+## Roadmap / Planned
 
----
-
-**Repository Structure**
-
-- `Backend/` — Express server and API
-	- `controllers/` — route handlers
-	- `routes/` — route definitions
-	- `schemas/` — request validation schemas
-	- `db/` — database connection helper (`sql.js`)
-	- `middleware/` — `validation.js`, `verify.js`
-	- `utils/` — `jwt.js` helper
-- `Frontend/` — React + Vite application
-	- `src/pages/` — page-level components
-	- `src/components/` — shared components
-	- `src/utils/` — client helpers (e.g., `auth.js`)
-
----
-
-**Tech Stack**
-
-- Backend: Node.js, Express, mysql2, Zod, jsonwebtoken
-- Frontend: React, Vite, react-router-dom
-
----
-
-**Development Notes & Conventions**
-
-- CORS is currently configured to allow `http://localhost:5173` (Vite dev server) in `Backend/index.js`.
-- Auth is cookie-based: the server sets a `token` cookie; the frontend must include credentials in fetch requests.
-
-Example fetch using credentials (frontend):
-
-```js
-fetch('http://localhost:8000/application', {
-	credentials: 'include'
-})
-```
-
----
-
-**Testing & Linting**
-
-- Frontend: run `npm run lint` from `Frontend/` (project contains ESLint config).
-- Backend: there are no automated tests included; nodemon can be used for local development (`npm run test` in `Backend/` uses nodemon).
-
----
-
-**Deployment**
-
-Minimal production steps:
-
-1. Build frontend: `cd Frontend && npm run build`.
-2. Serve static build with a static host (Netlify, Vercel) or serve from the backend using a static middleware.
-3. Run the backend with a process manager (PM2, systemd) and set environment variables for production database and `SECRET_KEY`.
-
-Considerations:
-- Use HTTPS in production and secure cookie attributes (`httpOnly`, `secure`, `sameSite`).
-- Rotate `SECRET_KEY` and use a secrets manager for production credentials.
-
----
-
-**Contribution Guidelines**
-
-- Fork the repository and create feature branches.
-- Open PRs against `main` with a clear description and testing steps.
-- Follow consistent linting and code style. Add unit/integration tests where appropriate.
-
-If you'd like, I can add a `CONTRIBUTING.md` template.
+- Continue polishing the React/Vite frontend in `Frontend/` for production use.
+- Confirm whether `DB_CONNECTION_LIMIT` should be documented in `Backend/.env.example`.
+- No `TODO` or `FIXME` markers were found in the current codebase.
 
 ---

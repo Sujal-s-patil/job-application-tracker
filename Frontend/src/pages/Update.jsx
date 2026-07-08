@@ -28,7 +28,7 @@ function UpdateForm() {
                     return
                 }
 
-                const nextApplication = response?.row?.[0] ?? null
+                const nextApplication = response?.row ?? null
                 setApplication(nextApplication)
 
                 if (nextApplication) {

@@ -41,7 +41,7 @@ function Dashboard() {
           baseApplications.map(async (application) => {
             try {
               const detailResponse = await request(`/application/${application.id}`)
-              const detail = detailResponse?.row?.[0] ?? detailResponse?.row ?? application
+              const detail = detailResponse?.row ?? detailResponse?.row ?? application
               return { ...application, ...detail }
             } catch {
               return application

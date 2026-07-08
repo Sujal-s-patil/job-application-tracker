@@ -52,7 +52,7 @@ export default function ApplicationDetailsModal({ applicationId, onClose, onDele
           return
         }
 
-        setApplication(response?.row?.[0] ?? null)
+        setApplication(response?.row ?? null)
         setStatus("ready")
       } catch (loadError) {
         if (!active) {

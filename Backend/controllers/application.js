@@ -1,11 +1,17 @@
-import { pool } from "../db/pool.js";
-import { createError } from "../utils/createError.js"
+import createError from "../utils/createError.js"
+import {
+    getAllApplications,
+    insertIntoApplications,
+    getApplicationById,
+    deleteApplicationById,
+    updateApplicationById,
+    updateApplicationStatusById
+} from "../queries/application.js"
 
-async function getAppliactions(req, res, next) {
+async function getApplications(req, res, next) {
     try {
-        const query = 'SELECT id,title,roleApplied,jobDescription FROM applications where userId=?'
-        const [rows] = await pool.query(query, req.user.id);
-        return res.status(200).json({ success: true, rows })
+        const result = await getAllApplications(req.user.id)
+        return res.status(200).json({ success: true, rows: result })
     } catch (error) {
         next(error)
     }
@@ -14,11 +20,7 @@ async function getAppliactions(req, res, next) {
 
 async function createApplication(req, res, next) {
     try {
-        const keys = Object.keys(req.validatedData);
-        const values = [req.user.id, ...Object.values(req.validatedData)]
-        const query = `INSERT INTO applications (userId,${keys}) values (?,${new Array(keys.length).fill("?").join(",")})`;
-
-        await pool.query(query, values);
+        await insertIntoApplications(req.validatedData, req.user.id)
         return res.status(201).json({ success: true, message: "created application" })
     } catch (error) {
         next(error)
@@ -28,13 +30,9 @@ async function createApplication(req, res, next) {
 
 async function getApplication(req, res, next) {
     try {
-        const id = req.params.id
-        const query = `select * from applications where id=? and userId=?`;
-        const [row] = await pool.query(query, [id, req.user.id]);
-
-        if (row.length === 0) throw createError("Application deos not exist", 404)
-
-        return res.status(200).json({ success: true, message: "successfull", row })
+        const result = await getApplicationById(req.params.id, req.user.id)
+        if (!result) throw createError("Application deos not exist", 404)
+        return res.status(200).json({ success: true, row: result })
     } catch (error) {
         next(error)
     }
@@ -42,11 +40,9 @@ async function getApplication(req, res, next) {
 
 async function deleteApplication(req, res, next) {
     try {
-        const id = req.params.id;
-        const query = `delete from applications where id=? and userId=?`
-        const [result] = await pool.query(query, [id, req.user.id])
-        if (!result.affectedRows) throw createError("Application does not exist", 404)
-        return res.status(204).json({ success: true, message: "deleted the application successfully" })
+        const result = await deleteApplicationById(req.params.id, req.user.id)
+        if (!result) throw createError("Application does not exist", 404)
+        return res.status(200).json({ success: true, message: "deleted the application successfully" })
     } catch (error) {
         next(error)
     }
@@ -54,24 +50,29 @@ async function deleteApplication(req, res, next) {
 
 async function updateApplication(req, res, next) {
     try {
-        if (!req.params.id) throw createError("Id is not provided", 401)
+        const result = await updateApplicationById(req.validatedData, req.params.id, req.user.id)
+        if (!result) throw createError("Application does not exist", 404)
+        return res.status(200).json({ success: true, message: "updated application" })
+    } catch (error) {
+        next(error)
+    }
+}
 
-        const keys = Object.keys(req.validatedData);
-        const values = Object.values(req.validatedData);
-        values.push(req.params.id);
-        values.push(req.user.id);
-        const query = `UPDATE applications set ${keys.map((v) => v + '=?')} where id=? and userId=?`;
-        const result = await pool.query(query, values);
-        return res.status(201).json({ success: true, message: "updated application" })
+async function updateApplicationStatus(req, res, next) {
+    try {
+        const result = await updateApplicationStatusById(req.validatedData.applicationStatus, req.params.id, req.user.id)
+        if (!result) throw createError("Application does not exist", 404)
+        return res.status(200).json({ success: true, message: "updated successfully" })
     } catch (error) {
         next(error)
     }
 }
 
 export {
-    getAppliactions,
+    getApplications,
     getApplication,
     createApplication,
     deleteApplication,
-    updateApplication
+    updateApplication,
+    updateApplicationStatus
 }

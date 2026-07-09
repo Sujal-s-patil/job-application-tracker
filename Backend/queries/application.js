@@ -33,7 +33,7 @@ async function updateApplicationById(data, id, userId) {
 }
 
 async function updateApplicationStatusById(status, id, userId) {
-    const [result] = await pool.query(`UPDATE applications SET status=? WHERE id=? AND userId=?`, [status, id, userId]);
+    const [result] = await pool.query(`UPDATE applications SET applicationStatus=? WHERE id=? AND userId=?`, [status, id, userId]);
     return result.affectedRows
 }
 

@@ -10,7 +10,7 @@ import { Modal } from "../components/ui/Modal"
 function UserProfile({ info }) {
     const [panel, setPanel] = useState(false)
     const [deleteAccount, setDeleteAccount] = useState(false)
-    const [formData, setFormData] = useState({ email: info?.email || "", password: "" })
+    const [formData, setFormData] = useState({ password: "" })
     const [errors, setErrors] = useState({})
     const [isSubmitting, setIsSubmitting] = useState(false)
     const navigate = useNavigate()
@@ -32,10 +32,6 @@ function UserProfile({ info }) {
 
         const nextErrors = {}
 
-        if (!formData.email.trim()) {
-            nextErrors.email = "Email is required."
-        }
-
         if (!formData.password.trim()) {
             nextErrors.password = "Password is required."
         }
@@ -52,7 +48,6 @@ function UserProfile({ info }) {
             await request("/user/me", {
                 method: "DELETE",
                 body: {
-                    email: formData.email.trim(),
                     password: formData.password,
                 },
             })
@@ -114,15 +109,6 @@ function UserProfile({ info }) {
                 }
             >
                 <form id="delete-account-form" onSubmit={handleDeleteSubmit} className="grid gap-4">
-                    <InputField
-                        id="delete-email"
-                        name="email"
-                        type="email"
-                        label="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        error={errors.email}
-                    />
                     <InputField
                         id="delete-password"
                         name="password"

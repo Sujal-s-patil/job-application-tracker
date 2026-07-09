@@ -3,7 +3,7 @@ const validate = (schema) => (req, res, next) => {
     if (!result.success) {
         const error = JSON.parse(result.error.message)
         return res.status(400).json({
-            succcess: false, message: error[0]
+            success: false, message: error[0]
         })
     }
 

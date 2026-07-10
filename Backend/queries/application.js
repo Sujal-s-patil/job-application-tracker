@@ -1,7 +1,7 @@
 import pool from "../db/pool.js"
 
 async function getAllApplications(userId) {
-    const [rows] = await pool.query(`SELECT id,title,roleApplied,jobDescription FROM applications where userId=?`, [userId]);
+    const [rows] = await pool.query(`SELECT * FROM applications where userId=?`, [userId]);
     return rows;
 }
 
@@ -10,11 +10,6 @@ async function insertIntoApplications(data, userId) {
     const values = [userId, ...Object.values(data)]
     const query = `INSERT INTO applications (userId,${keys}) values (?,${new Array(keys.length).fill("?").join(",")})`;
     await pool.query(query, values);
-}
-
-async function getApplicationById(id, userId) {
-    const [row] = await pool.query(`SELECT * FROM applications WHERE id=? AND userId=?`, [id, userId])
-    return row[0] ?? null
 }
 
 async function deleteApplicationById(id, userId) {
@@ -40,7 +35,6 @@ async function updateApplicationStatusById(status, id, userId) {
 export {
     getAllApplications,
     insertIntoApplications,
-    getApplicationById,
     deleteApplicationById,
     updateApplicationById,
     updateApplicationStatusById

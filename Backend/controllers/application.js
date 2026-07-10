@@ -2,7 +2,6 @@ import createError from "../utils/createError.js"
 import {
     getAllApplications,
     insertIntoApplications,
-    getApplicationById,
     deleteApplicationById,
     updateApplicationById,
     updateApplicationStatusById
@@ -26,16 +25,6 @@ async function createApplication(req, res, next) {
         next(error)
     }
 
-}
-
-async function getApplication(req, res, next) {
-    try {
-        const result = await getApplicationById(req.params.id, req.user.id)
-        if (!result) throw createError("Application deos not exist", 404)
-        return res.status(200).json({ success: true, row: result })
-    } catch (error) {
-        next(error)
-    }
 }
 
 async function deleteApplication(req, res, next) {
@@ -70,7 +59,6 @@ async function updateApplicationStatus(req, res, next) {
 
 export {
     getApplications,
-    getApplication,
     createApplication,
     deleteApplication,
     updateApplication,

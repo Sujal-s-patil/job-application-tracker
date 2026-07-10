@@ -5,7 +5,6 @@ import { createApplicationSchema, updateApplicationSchema, updateApplicationStat
 
 import {
     getApplications,
-    getApplication,
     createApplication,
     deleteApplication,
     updateApplication,
@@ -19,7 +18,6 @@ applicationRoute
 
 applicationRoute
     .route("/:id")
-    .get(getApplication)
     .put(validate(updateApplicationSchema), updateApplication)
     .delete(deleteApplication)
 

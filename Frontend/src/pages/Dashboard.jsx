@@ -135,7 +135,7 @@ function Dashboard() {
                 handleApplicationStatusChange(Number(draggedApplicationId), statusKey)
               }
             }}
-            className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50/70 p-5"
+            className="min-h-[540px] space-y-4 rounded-3xl border border-slate-200 bg-slate-50/70 p-5"
           >
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-600">{statusKey}</h2>

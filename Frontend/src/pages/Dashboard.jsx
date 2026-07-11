@@ -14,7 +14,7 @@ function Dashboard() {
   const [applications, setApplications] = useState([])
   const [status, setStatus] = useState("loading")
   const [error, setError] = useState("")
-  const [selectedApplicationId, setSelectedApplicationId] = useState(null)
+  const [selectedApplication, setSelectedApplication] = useState(null)
   const [userInfo] = useState(() => readUserInfo())
   const location = useLocation()
   const { notify } = useNotifications()
@@ -36,20 +36,7 @@ function Dashboard() {
           return
         }
 
-        const baseApplications = response?.rows ?? []
-        const enrichedApplications = await Promise.all(
-          baseApplications.map(async (application) => {
-            try {
-              const detailResponse = await request(`/application/${application.id}`)
-              const detail = detailResponse?.row ?? detailResponse?.row ?? application
-              return { ...application, ...detail }
-            } catch {
-              return application
-            }
-          }),
-        )
-
-        setApplications(enrichedApplications)
+        setApplications(response?.rows ?? [])
         setStatus("ready")
       } catch (fetchError) {
         if (!active) {
@@ -86,7 +73,7 @@ function Dashboard() {
 
   const handleApplicationDeleted = (deletedId) => {
     setApplications((current) => current.filter((application) => application.id !== deletedId))
-    setSelectedApplicationId(null)
+    setSelectedApplication(null)
   }
 
   const statuses = ["applied", "interview", "accepted", "rejected"]
@@ -160,7 +147,7 @@ function Dashboard() {
                   <ApplicationCard
                     key={application.id}
                     application={application}
-                    onOpen={setSelectedApplicationId}
+                    onOpen={setSelectedApplication}
                     draggable
                     onDragStart={(event) => {
                       event.dataTransfer.setData("text/plain", String(application.id))
@@ -191,10 +178,10 @@ function Dashboard() {
     >
       {content}
 
-      {selectedApplicationId ? (
+      {selectedApplication ? (
         <ApplicationDetailsModal
-          applicationId={selectedApplicationId}
-          onClose={() => setSelectedApplicationId(null)}
+          application={selectedApplication}
+          onClose={() => setSelectedApplication(null)}
           onDelete={handleApplicationDeleted}
         />
       ) : null}

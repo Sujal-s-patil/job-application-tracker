@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Link } from "react-router-dom"
 import { Button } from "./ui/Button"
-import { ErrorState, SkeletonBlock } from "./ui/Feedback"
+import { SkeletonBlock } from "./ui/Feedback"
 import { request } from "../lib/api"
 import { useNotifications } from "./notifications/useNotifications"
 
@@ -29,49 +29,11 @@ function DetailSkeleton() {
   )
 }
 
-export default function ApplicationDetailsModal({ applicationId, onClose, onDelete }) {
+export default function ApplicationDetailsModal({ application, onClose, onDelete }) {
   const { notify } = useNotifications()
-  const [status, setStatus] = useState("loading")
-  const [application, setApplication] = useState(null)
-  const [error, setError] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [reloadIndex, setReloadIndex] = useState(0)
   const closeButtonRef = useRef(null)
-
-  useEffect(() => {
-    let active = true
-
-    async function loadApplication() {
-      setStatus("loading")
-      setError("")
-
-      try {
-        const response = await request(`/application/${applicationId}`)
-        if (!active) {
-          return
-        }
-
-        setApplication(response?.row ?? null)
-        setStatus("ready")
-      } catch (loadError) {
-        if (!active) {
-          return
-        }
-
-        setError(loadError.message || "Unable to load application details.")
-        setStatus("error")
-      }
-    }
-
-    if (applicationId) {
-      loadApplication()
-    }
-
-    return () => {
-      active = false
-    }
-  }, [applicationId, reloadIndex])
 
   useEffect(() => {
     if (showDeleteConfirm) {
@@ -99,9 +61,9 @@ export default function ApplicationDetailsModal({ applicationId, onClose, onDele
     setIsDeleting(true)
 
     try {
-      await request(`/application/${applicationId}`, { method: "DELETE" })
+      await request(`/application/${application.id}`, { method: "DELETE" })
       notify("Application deleted.", "success")
-      onDelete(applicationId)
+      onDelete(application.id)
       onClose()
     } catch (deleteError) {
       notify(deleteError.message || "Unable to delete this application.", "error")
@@ -136,9 +98,7 @@ export default function ApplicationDetailsModal({ applicationId, onClose, onDele
         </div>
 
         <div className="grid gap-6 px-6 py-6 sm:px-7">
-          {status === "loading" ? <DetailSkeleton /> : null}
-          {status === "error" ? <ErrorState title="Unable to load details" message={error} onRetry={() => setReloadIndex((current) => current + 1)} /> : null}
-          {status === "ready" && application ? (
+          {application ? (
             <div className="grid gap-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <DetailRow label="Role applied" value={application.roleApplied} />
@@ -152,10 +112,12 @@ export default function ApplicationDetailsModal({ applicationId, onClose, onDele
                 <DetailRow label="Rejected note" value={application.noteForRejected} />
               </div>
             </div>
-          ) : null}
+          ) : (
+            <DetailSkeleton />
+          )}
 
           <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <Link to={`/update/${applicationId}`} className="btn btn-secondary">
+            <Link to={`/update/${application?.id ?? ""}`} className="btn btn-secondary">
               Edit application
             </Link>
             <div className="flex flex-col gap-3 sm:flex-row">

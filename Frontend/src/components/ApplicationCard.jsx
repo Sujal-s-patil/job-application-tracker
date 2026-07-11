@@ -29,7 +29,7 @@ export default function ApplicationCard({ application, onOpen, draggable = false
         <p className="text-sm leading-6 text-slate-600 line-clamp-3">{application.jobDescription}</p>
       </div>
       <div className="mt-5 flex items-center justify-end gap-3">
-        <Button type="button" variant="secondary" className="px-3 py-2 text-xs" onClick={() => onOpen(application.id)}>
+        <Button type="button" variant="secondary" className="px-3 py-2 text-xs" onClick={() => onOpen(application)}>
           View details
         </Button>
       </div>

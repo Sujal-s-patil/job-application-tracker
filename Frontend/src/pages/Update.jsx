@@ -1,70 +1,40 @@
-import { useEffect, useState } from "react"
-import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { useState } from "react"
+import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom"
 import ApplicationForm from "../components/ApplicationForm"
 import { PageShell } from "../components/layout/PageShell"
 import { Button } from "../components/ui/Button"
-import { ErrorState, FullPageLoader } from "../components/ui/Feedback"
+import { ErrorState } from "../components/ui/Feedback"
 import { request, sanitizePayload } from "../lib/api"
-import { initialApplicationValues, normalizeApplicationValues, validateApplication } from "../lib/applicationForm"
+import { normalizeApplicationValues, validateApplication } from "../lib/applicationForm"
 import { useNotifications } from "../components/notifications/useNotifications"
 
 function UpdateForm() {
     const { id } = useParams()
     const navigate = useNavigate()
+    const location = useLocation()
     const { notify } = useNotifications()
-    const [status, setStatus] = useState("loading")
-    const [application, setApplication] = useState(null)
-    const [formData, setFormData] = useState(initialApplicationValues)
+
+    // The application record is handed to us via router state (from the
+    // details modal's "Edit application" link) instead of being re-fetched
+    // from the API. Dashboard already loaded every application once.
+    const application = location.state?.application ?? null
+
+    const [formData, setFormData] = useState(() =>
+        application
+            ? {
+                  title: application.title ?? "",
+                  roleApplied: application.roleApplied ?? "",
+                  jobDescription: application.jobDescription ?? "",
+                  applicationStatus: application.applicationStatus ?? "applied",
+                  noteForApplied: application.noteForApplied ?? "",
+                  noteForInterview: application.noteForInterview ?? "",
+                  noteForAccepted: application.noteForAccepted ?? "",
+                  noteForRejected: application.noteForRejected ?? "",
+              }
+            : null,
+    )
     const [errors, setErrors] = useState({})
     const [isSubmitting, setIsSubmitting] = useState(false)
-
-    useEffect(() => {
-        let active = true
-
-        async function loadApplication() {
-            try {
-                const response = await request(`/application/${id}`)
-                if (!active) {
-                    return
-                }
-
-                const nextApplication = response?.row ?? null
-                setApplication(nextApplication)
-
-                if (nextApplication) {
-                    setFormData({
-                        title: nextApplication.title ?? "",
-                        roleApplied: nextApplication.roleApplied ?? "",
-                        jobDescription: nextApplication.jobDescription ?? "",
-                        applicationStatus: nextApplication.applicationStatus ?? "applied",
-                        noteForApplied: nextApplication.noteForApplied ?? "",
-                        noteForInterview: nextApplication.noteForInterview ?? "",
-                        noteForAccepted: nextApplication.noteForAccepted ?? "",
-                        noteForRejected: nextApplication.noteForRejected ?? "",
-                    })
-                    setStatus("ready")
-                    return
-                }
-
-                setStatus("error")
-            } catch (error) {
-                if (!active) {
-                    return
-                }
-
-                setStatus("error")
-                notify(error.message || "Unable to load application data.", "error")
-            }
-        }
-
-        if (id) {
-            loadApplication()
-        }
-
-        return () => {
-            active = false
-        }
-    }, [id, notify])
 
     const handleChange = (event) => {
         const { name, value } = event.target
@@ -107,14 +77,21 @@ function UpdateForm() {
         return <Navigate to="/dashboard" replace />
     }
 
-    if (status === "loading") {
-        return <FullPageLoader title="Loading application" message="Fetching the current application data." />
-    }
-
-    if (status === "error") {
+    // No state means this route was hit directly (refresh, bookmark, shared
+    // link) rather than via the dashboard's Edit link. Since we no longer
+    // fetch a single application, we can't recover the record here — send
+    // the user back rather than guessing or silently re-adding a fetch.
+    if (!application || !formData) {
         return (
-            <PageShell eyebrow="Applications" title="Update application" description="Edit the existing record and keep the data current.">
-                <ErrorState message="The application could not be loaded. Return to the dashboard and try again." onRetry={() => navigate("/dashboard")} />
+            <PageShell
+                eyebrow="Applications"
+                title="Update application"
+                description="Edit the existing record and keep the data current."
+            >
+                <ErrorState
+                    message="This application's data isn't available here. Open it from the dashboard to edit it."
+                    onRetry={() => navigate("/dashboard")}
+                />
             </PageShell>
         )
     }

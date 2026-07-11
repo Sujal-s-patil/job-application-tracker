@@ -58,14 +58,14 @@ function Dashboard() {
   useEffect(() => {
     const flashMessage = location.state?.flashMessage
 
-    if (selectedApplicationId || !flashMessage || hasShownFlashMessageRef.current) {
+    if (selectedApplication || !flashMessage || hasShownFlashMessageRef.current) {
       return
     }
 
     hasShownFlashMessageRef.current = true
     notify(flashMessage, location.state?.flashTone || "success")
     window.history.replaceState({}, document.title)
-  }, [location.state?.flashMessage, location.state?.flashTone, notify, selectedApplicationId])
+  }, [location.state?.flashMessage, location.state?.flashTone, notify, selectedApplication])
 
   const handleRetry = () => {
     setStatus("loading")

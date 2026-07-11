@@ -117,7 +117,11 @@ export default function ApplicationDetailsModal({ application, onClose, onDelete
           )}
 
           <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <Link to={`/update/${application?.id ?? ""}`} className="btn btn-secondary">
+            <Link
+              to={`/update/${application?.id ?? ""}`}
+              state={{ application }}
+              className="btn btn-secondary"
+            >
               Edit application
             </Link>
             <div className="flex flex-col gap-3 sm:flex-row">

@@ -33,7 +33,7 @@ function Register() {
 
         setIsSubmitting(true)
         setFormError("")
-        const body = normalizeUserData(formData)
+        const body = normalizeUserData(formData, true)
         try {
             const response = await request("/user/register", {
                 method: "POST",

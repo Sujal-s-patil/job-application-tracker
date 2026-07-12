@@ -147,7 +147,6 @@ The backend starts with `npm start` in `Backend/` and reads `.env` with `node --
 | `DB_PASSWORD` | MySQL password. | Y |
 | `DB_DATABASE` | MySQL database name. | Y |
 
-Note: `Backend/db/pool.js` also reads `DB_CONNECTION_LIMIT` and defaults it to `20`, but that variable is not listed in `Backend/.env.example`, so it is marked as TODO to confirm.
 
 ### Frontend (`Frontend/.env.example`)
 
@@ -167,7 +166,6 @@ Note: `Backend/db/pool.js` also reads `DB_CONNECTION_LIMIT` and defaults it to `
 | DELETE | `/user/me` | Y | Delete the authenticated user after password verification. |
 | GET | `/application` | Y | List applications for the authenticated user. |
 | POST | `/application` | Y | Create a new application for the authenticated user. |
-| GET | `/application/:id` | Y | Fetch one application owned by the authenticated user. |
 | PUT | `/application/:id` | Y | Update one application owned by the authenticated user. |
 | DELETE | `/application/:id` | Y | Delete one application owned by the authenticated user. |
 | PATCH | `/application/:id/status` | Y | Update the status of one application owned by the authenticated user. |

@@ -1,0 +1,77 @@
+services:
+  database:
+    image: mysql:8.4
+    container_name: job_application_tracker_database
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./Backend/db/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - job_application_tracker_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: job_application_tracker_backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: database
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      SECRET_KEY: ${SECRET_KEY}
+      PORT: 8000
+      CLIENT_URL: {CLIENT_URL}
+      DB_CONNECTION_LIMIT: 20
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Backend:/app
+      - /app/node_modules
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - job_application_tracker_network
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: job_application_tracker_police
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - job_application_tracker_network
+    stdin_open: true
+    tty: true
+
+networks:
+  job_application_tracker_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

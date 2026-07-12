@@ -1,7 +1,7 @@
 services:
   database:
     image: mysql:8.4
-    container_name: job_application_tracker_database
+    container_name: jat_database
     restart: unless-stopped
     environment:
       MYSQL_USER: ${MYSQL_USER}
@@ -14,7 +14,7 @@ services:
       - mysql_data:/var/lib/mysql
       - ./Backend/db/schema.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - job_application_tracker_network
+      - jat_network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
@@ -26,7 +26,7 @@ services:
     build:
       context: ./Backend
       dockerfile: Dockerfile
-    container_name: job_application_tracker_backend
+    container_name: jat_backend
     restart: unless-stopped
     environment:
       DB_HOST: database
@@ -35,7 +35,7 @@ services:
       DB_NAME: ${MYSQL_DATABASE}
       SECRET_KEY: ${SECRET_KEY}
       PORT: 8000
-      CLIENT_URL: {CLIENT_URL}
+      CLIENT_URL: ${CLIENT_URL}
       DB_CONNECTION_LIMIT: 20
     ports:
       - "8000:8000"
@@ -46,13 +46,13 @@ services:
       database:
         condition: service_healthy
     networks:
-      - job_application_tracker_network
+      - jat_network
 
   frontend:
     build:
       context: ./Frontend
       dockerfile: Dockerfile
-    container_name: job_application_tracker_police
+    container_name: jat_frontend
     restart: unless-stopped
     environment:
       - VITE_API_URL=http://localhost:8000
@@ -65,12 +65,12 @@ services:
     depends_on:
       - backend
     networks:
-      - job_application_tracker_network
+      - jat_network
     stdin_open: true
     tty: true
 
 networks:
-  job_application_tracker_network:
+  jat_network:
     driver: bridge
 
 volumes:

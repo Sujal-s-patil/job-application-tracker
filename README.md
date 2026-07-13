@@ -1,115 +1,125 @@
-# Job Application Tracker
+<div align="center">
 
-A full-stack job application tracker with a Node.js/Express + MySQL API and a React/Vite frontend for managing applications, status changes, and account access.
+# 📋 Job Application Tracker (JAT)
 
-## Features
+**A full-stack web app to organize, track, and manage your job hunt — end to end.**
 
-- User registration, login, logout, session verification, and account deletion.
-- JWT authentication stored in an `httpOnly` cookie.
-- CRUD for job applications owned by the authenticated user.
-- Application status updates across `applied`, `interview`, `accepted`, and `rejected`.
-- Dashboard view that groups applications by status and supports drag-and-drop status changes.
-- Zod-backed request validation for both user and application payloads.
-- Rate limiting on auth routes and protected application routes.
-- React/Vite frontend with protected routes, notifications, and application detail modals.
+Built with React, Node.js/Express, and MySQL
 
-## Tech Stack
+</div>
 
-### Backend
+---
 
-- Node.js
-- Express
-- mysql2
-- bcrypt
-- cookie-parser
-- cors
-- helmet
-- express-rate-limit
-- jsonwebtoken
-- zod
-- jest
+## 🧭 What is this?
 
-### Frontend
+Job hunting means juggling dozens of applications across different companies, stages, and deadlines — and it's easy to lose track of what's happening where. **Job Application Tracker (JAT)** solves that by giving you one clean dashboard to log every application, see its status at a glance, and update it as things progress — no more spreadsheets or sticky notes.
 
-- React 19
-- react-dom
-- react-router-dom
-- Vite
-- @vitejs/plugin-react
-- @rolldown/plugin-babel
-- @tailwindcss/vite
-- tailwindcss
-- babel-plugin-react-compiler
-- eslint
-- @eslint/js
-- @babel/core
-- @types/react
-- @types/react-dom
-- globals
+---
 
-## Folder Structure
+## ✨ Features (for everyone)
+
+- **Personal Account** — Sign up and log in securely; your data is private to you.
+- **Add Applications** — Log every job you apply to: company, role, and status.
+- **Visual Dashboard** — Applications are organized into columns — *Applied*, *Interview*, *Accepted*, *Rejected* — like a Kanban/to-do board.
+- **Drag-and-Drop Status Updates** — Just drag a card to a new column as your application progresses.
+- **Edit & Delete** — Update details or remove applications you no longer need to track.
+- **Secure by Design** — Your login session is protected, and only you can see or edit your own applications.
+- **Account Control** — Delete your account and all associated data whenever you want.
+
+---
+
+## 🛠️ Technical Overview (for developers)
+
+### Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React 19, Vite, React Router, Tailwind CSS, React Compiler |
+| **Backend** | Node.js, Express, JWT, bcrypt, Zod, express-rate-limit |
+| **Database** | MySQL 8.4 (via `mysql2`) |
+| **Testing** | Jest |
+| **Infrastructure** | Docker, Docker Compose |
+
+### Architecture
+
+- **Frontend** — React + Vite SPA with protected routes, a Kanban-style dashboard, and bulk-fetch data loading.
+- **Backend** — Modular Express API (routes → controllers → queries → schemas) with clear separation of concerns.
+- **Database** — MySQL with parameterized, injection-safe queries via `mysql2`.
+- **Auth** — JWT stored in an `httpOnly` cookie; passwords hashed with `bcrypt`.
+- **Validation** — All request payloads validated with strict Zod schemas.
+- **Rate Limiting** — Separate limiters for auth routes vs general application routes.
+
+### Folder Structure
 
 ```text
 .
 ├── Backend/
-│   ├── .env.example
-│   ├── config/
-│   │   └── env.js
-│   ├── controllers/
-│   │   ├── application.js
-│   │   └── user.js
-│   ├── db/
-│   │   ├── pool.js
-│   │   └── schema.sql
-│   ├── middleware/
-│   │   ├── rateLimiter.js
-│   │   ├── validation.js
-│   │   └── verify.js
-│   ├── queries/
-│   │   ├── application.js
-│   │   └── user.js
-│   ├── routes/
-│   │   ├── application.js
-│   │   └── user.js
-│   ├── schemas/
-│   │   ├── applicationSchema.js
-│   │   └── userSchema.js
-│   ├── utils/
-│   │   ├── cookie.js
-│   │   ├── createError.js
-│   │   └── jwt.js
-│   ├── index.js
-│   ├── package.json
-│   └── readme.md
+│   ├── config/          # Environment config
+│   ├── controllers/      # Request handlers
+│   ├── db/                # MySQL pool + schema
+│   ├── middleware/        # Rate limiting, validation, auth checks
+│   ├── queries/           # Parameterized SQL queries
+│   ├── routes/            # Express routers
+│   ├── schemas/           # Zod validation schemas
+│   ├── utils/             # Cookie/JWT/error helpers
+│   └── index.js           # App entry point
 ├── Frontend/
-│   ├── .env.example
-│   ├── public/
-│   │   ├── favicon.svg
-│   │   └── icons.svg
 │   ├── src/
-│   │   ├── App.jsx
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── lib/
-│   │   ├── pages/
-│   │   └── utils/
-│   ├── eslint.config.js
-│   ├── index.html
-│   ├── package.json
+│   │   ├── components/    # Reusable UI components
+│   │   ├── hooks/         # Custom React hooks
+│   │   ├── lib/           # API client
+│   │   ├── pages/         # Route-level pages
+│   │   └── utils/         # Helper functions
 │   └── vite.config.js
-└── README.md
+└── docker-compose.yml
 ```
 
-## Setup & Installation
+### API Endpoints
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/` | — | Health check |
+| POST | `/user/register` | — | Register a new user |
+| POST | `/user/login` | — | Log in, sets auth cookie |
+| POST | `/user/logout` | — | Clears auth cookie |
+| GET | `/user/me` | ✅ | Verify current session |
+| DELETE | `/user/me` | ✅ | Delete account (password required) |
+| GET | `/application` | ✅ | List all applications |
+| POST | `/application` | ✅ | Create an application |
+| PUT | `/application/:id` | ✅ | Update an application |
+| DELETE | `/application/:id` | ✅ | Delete an application |
+| PATCH | `/application/:id/status` | ✅ | Update application status |
+
+### Security Measures
+
+- Passwords hashed with `bcrypt`
+- JWT auth stored in `httpOnly` cookies with `sameSite`/`secure` flags based on environment
+- Strict Zod validation on all inputs
+- Rate limiting on auth and application routes
+- Parameterized SQL (no injection risk)
+- `helmet` + CORS configured on the Express app
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js 18 or newer
+- Node.js 18+
 - npm
-- MySQL-compatible database
+- MySQL-compatible database (or Docker)
 
-### Backend
+### Run with Docker (recommended)
 
+```bash
+docker compose up --build
+```
+
+This spins up the MySQL database, backend API, and frontend dev server together.
+
+### Manual Setup
+
+**Backend**
 ```bash
 cd Backend
 npm install
@@ -117,8 +127,7 @@ cp .env.example .env
 npm start
 ```
 
-### Frontend
-
+**Frontend**
 ```bash
 cd Frontend
 npm install
@@ -126,64 +135,37 @@ cp .env.example .env
 npm run dev
 ```
 
-The backend starts with `npm start` in `Backend/` and reads `.env` with `node --env-file=.env index.js`. The frontend runs with Vite on the default dev port.
+### Environment Variables
 
-### Useful scripts
-
-- Backend: `npm start`, `npm test`
-- Frontend: `npm run dev`, `npm run build`, `npm run lint`, `npm run preview`
-
-## Environment Variables
-
-### Backend (`Backend/.env.example`)
+**Backend (`Backend/.env.example`)**
 
 | Variable | Description | Required |
-| --- | --- | --- |
-| `SECRET_KEY` | JWT signing secret used by `Backend/utils/jwt.js`. | Y |
-| `PORT` | Server port. Defaults to `8000` in `Backend/config/env.js`. | N |
-| `CLIENT_URL` | Allowed frontend origin used by CORS in `Backend/index.js`. | Y |
-| `DB_HOST` | MySQL host. | Y |
-| `DB_USER` | MySQL user. | Y |
-| `DB_PASSWORD` | MySQL password. | Y |
-| `DB_DATABASE` | MySQL database name. | Y |
+|---|---|---|
+| `SECRET_KEY` | JWT signing secret | ✅ |
+| `PORT` | Server port (default `8000`) | ❌ |
+| `CLIENT_URL` | Allowed frontend origin for CORS | ✅ |
+| `DB_HOST` | MySQL host | ✅ |
+| `DB_USER` | MySQL user | ✅ |
+| `DB_PASSWORD` | MySQL password | ✅ |
+| `DB_DATABASE` | MySQL database name | ✅ |
 
-
-### Frontend (`Frontend/.env.example`)
+**Frontend (`Frontend/.env.example`)**
 
 | Variable | Description | Required |
-| --- | --- | --- |
-| `VITE_API_URL` | Base URL for the backend API used by `Frontend/src/lib/api.js`. | Y |
-
-## API Endpoints
-
-| Method | Path | Auth required | Description |
-| --- | --- | --- | --- |
-| GET | `/` | N | Health check that returns `server is running`. |
-| POST | `/user/register` | N | Register a new user. |
-| POST | `/user/login` | N | Authenticate a user and set the auth cookie. |
-| POST | `/user/logout` | N | Clear the auth cookie. |
-| GET | `/user/me` | Y | Verify the current authenticated session. |
-| DELETE | `/user/me` | Y | Delete the authenticated user after password verification. |
-| GET | `/application` | Y | List applications for the authenticated user. |
-| POST | `/application` | Y | Create a new application for the authenticated user. |
-| PUT | `/application/:id` | Y | Update one application owned by the authenticated user. |
-| DELETE | `/application/:id` | Y | Delete one application owned by the authenticated user. |
-| PATCH | `/application/:id/status` | Y | Update the status of one application owned by the authenticated user. |
-
-## Security Measures Implemented
-
-- Passwords are hashed with `bcrypt` before storage.
-- Auth uses JWTs signed with `SECRET_KEY` and stored in an `httpOnly` cookie.
-- Cookie flags are set with `sameSite` and `secure` behavior based on `NODE_ENV`.
-- Request payloads are validated with strict Zod schemas.
-- Auth and application routes are rate-limited with `express-rate-limit`.
-- SQL writes use parameterized MySQL queries with `?` placeholders.
-- `helmet` and CORS are enabled in the Express app bootstrap.
-
-## Roadmap / Planned
-
-- Continue polishing the React/Vite frontend in `Frontend/` for production use.
-- Confirm whether `DB_CONNECTION_LIMIT` should be documented in `Backend/.env.example`.
-- No `TODO` or `FIXME` markers were found in the current codebase.
+|---|---|---|
+| `VITE_API_URL` | Base URL for the backend API | ✅ |
 
 ---
+
+## 🗺️ Roadmap
+
+- [ ] Continue polishing the React/Vite frontend for production
+- [ ] Add automated test coverage for edge cases
+
+---
+
+<div align="center">
+
+Built by **Sujal Patil** · [Portfolio](https://sujalpatil.dev) · [GitHub](https://github.com/Sujal-s-patil)
+
+</div>

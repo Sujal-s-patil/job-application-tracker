@@ -28,6 +28,29 @@ Job hunting means juggling dozens of applications across different companies, st
 
 ---
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td align="center"><b>Sign In</b><br/><img src="screenshots/login.png" width="400"/></td>
+    <td align="center"><b>Create Account</b><br/><img src="screenshots/signup.png" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Empty Dashboard</b><br/><img src="screenshots/empty-dashboard.png" width="400"/></td>
+    <td align="center"><b>Add Application</b><br/><img src="screenshots/add-application.png" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Kanban Dashboard</b><br/><img src="screenshots/dashboard.png" width="400"/></td>
+    <td align="center"><b>Account Modal</b><br/><img src="screenshots/account-modal.png" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Application Details</b><br/><img src="screenshots/application-details.png" width="400"/></td>
+    <td align="center"><b>Update Application</b><br/><img src="screenshots/update-application.png" width="400"/></td>
+  </tr>
+</table>
+
+---
+
 ## 🛠️ Technical Overview (for developers)
 
 ### Tech Stack
